@@ -49,7 +49,7 @@
 
 ________________________________________________________________________________________________________]]
 
-local Toolbar = plugin:CreateToolbar("GeoJSON Importer 2.0")
+local Toolbar = plugin:CreateToolbar("GeoJSON Importer Early Access")
 local Button = Toolbar:CreateButton("Click to select a file", "Import GeoJSON", "rbxassetid://12993969414") -- TODO: make a proper icon
 
 local loader = require(script.loader)

@@ -17,7 +17,7 @@ local function checkPointIntoTriangle(point: Instance, a: Instance, b:Instance, 
 
 	local CrossProductY_1 = (pointToa.X * pointTob.Y) - (pointToa.Y * pointTob.X)
 	local CrossProductY_2 = (pointTob.X * pointToc.Y) - (pointTob.Y * pointToc.X)
-	local CrossProductY_3 = (pointToc.X * pointToa.Y) - (pointToc.Y * pointToa.X)	
+	local CrossProductY_3 = (pointToc.X * pointToa.Y) - (pointToc.Y * pointToa.X)
 
 	if CrossProductY_1 <0 or CrossProductY_2 <0 or CrossProductY_3 <0 then
 		return true
@@ -28,13 +28,13 @@ local function checkVertex(a: Instance,b: Instance, c:Instance, vertexlist)
 
 	local canMakeTriangle = true
 
-	local vectorA = Vector2.new(a.X - b.X, a.Z - b.Z)	
+	local vectorA = Vector2.new(a.X - b.X, a.Z - b.Z)
 	local vectorB = Vector2.new(a.X - c.X, a.Z - c.Z)
 	local moduleA = math.sqrt((vectorA.X)^2+(vectorA.Y)^2)
 	local moduleB = math.sqrt((vectorB.X)^2+(vectorB.Y)^2)
 	local CrossProductY = (vectorA.X * vectorB.Y) - (vectorA.Y * vectorB.X)
 	local sin = CrossProductY/(moduleA*moduleB)
-	local angle = math.deg(math.asin(sin))	
+	local angle = math.deg(math.asin(sin))
 
 	if angle > 0 then -- if the angle is higher than 180 degrees the variable angle will be a number under of 0 because the cross product will be negative
 		for i, v in pairs(vertexlist) do
@@ -42,7 +42,7 @@ local function checkVertex(a: Instance,b: Instance, c:Instance, vertexlist)
 				if not checkPointIntoTriangle(v, a, b, c) then
 					canMakeTriangle = false
 				end
-			end			
+			end
 		end
 		if canMakeTriangle then
 			return true
@@ -59,30 +59,30 @@ function Triangulation.Perform(vertexlist, unordered)
 		vertexlist = Order.Perform(vertexlist)
 		print(vertexlist)
 	end
-	
+
 	local vertexfound = false
 
 	while task.wait() do
-		for i, v in pairs(vertexlist) do	
+		for i, v in pairs(vertexlist) do
 			if i == 1 then
-				if checkVertex(v , vertexlist[i+1] , vertexlist[#vertexlist], vertexlist) then				
+				if checkVertex(v , vertexlist[i+1] , vertexlist[#vertexlist], vertexlist) then
 					vertexfound = true
-					Draw(v, vertexlist[i+1], vertexlist[#vertexlist], workspace)						
+					Draw(v, vertexlist[i+1], vertexlist[#vertexlist], workspace)
 					table.remove(vertexlist, i)
-				end		
+				end
 			elseif i == #vertexlist then
-				if checkVertex(v, vertexlist[1], vertexlist[i-1], vertexlist) then				
+				if checkVertex(v, vertexlist[1], vertexlist[i-1], vertexlist) then
 					vertexfound = true
-					Draw(v, vertexlist[1], vertexlist[i-1], workspace)								
+					Draw(v, vertexlist[1], vertexlist[i-1], workspace)
 					table.remove(vertexlist, i)
-				end	
-			elseif i ~= 1 and i ~= #vertexlist then	
-				if checkVertex(v , vertexlist[i+1] , vertexlist[i-1], vertexlist) then				
+				end
+			elseif i ~= 1 and i ~= #vertexlist then
+				if checkVertex(v , vertexlist[i+1] , vertexlist[i-1], vertexlist) then
 					vertexfound = true
-					Draw(v, vertexlist[i+1], vertexlist[i-1], workspace)		
+					Draw(v, vertexlist[i+1], vertexlist[i-1], workspace)
 					table.remove(vertexlist, i)
-				end		
-			end	
+				end
+			end
 			if vertexfound then
 				vertexfound = false
 				break

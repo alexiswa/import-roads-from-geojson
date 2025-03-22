@@ -11,7 +11,6 @@ local HttpService = game:GetService("HttpService")
 local lib = require(script.Parent.lib)
 local studConvert = lib.STUD_CONVERT
 
--- I LOVE MODULARITY! I LOVE BEING ABLE TO ADD NEW FEATURES WITH MINIMUM CHANGES!!!!
 --[[
 A table of all ways that are compatable with the plugin. If you want to add your own, you should be able to relatively easily.
 Currently supports most highway features, some waterway features, and has generic attributes for rail and barrier features.
@@ -238,7 +237,6 @@ function ways.Main(feature, i)
         elseif ways[key][value].defaultWidth then ways[key][value].defaultWidth
         else 5
 
-
     for point, _ in points do
         -- convert longitude and latitude into coordinates we can reasonably use on roblox
         local x, z = lib.Project(points[point][2], points[point][1])
@@ -250,7 +248,7 @@ function ways.Main(feature, i)
         part.Size = Vector3.new(1, 1, 1)
 
         if point >= 2 then
-            ways.Draw(location["point"..point - 1], location["point"..point], location, point)
+            ways.Draw(location["point"..point - 1], location["point"..point], location, i)
         end
     end
 
@@ -260,7 +258,7 @@ function ways.Main(feature, i)
             j.Size = Vector3.new(width, j.Size.Y, j.Size.Z) -- assign width
             if brickProperties ~= nil then
                 for p, property in brickProperties do
-                    j[p] = property
+                    j[p] = property -- assign other properties
                 end
             end
         elseif string.match(j.Name, "point") then -- if its a node, delete it

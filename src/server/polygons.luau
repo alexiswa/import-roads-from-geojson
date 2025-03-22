@@ -1,6 +1,6 @@
 local lib = require(script.Parent.lib)
-local triangulate = require(script.Parent.triangulate)
 local material = Enum.Material
+local triangulation = require(script.Parent.triangulation)
 
 polygons = {
     natural = {
@@ -373,26 +373,28 @@ function polygons.Main(feature, n)
     local vertices = {}
     local brickProperties = polygons[key][value].brickProperties
 
-    for point, _ in points do
-         -- convert longitude and latitude into coordinates we can reasonably use on roblox
-         local xPoint, yPoint = lib.Project(points[point][2], points[point][1])
+    -- this will give us a table of every point
 
-        -- plot each "point" onto the map. This is optional, but helps to visualize. I'm keeping it here for debugging purposes
+    for i, point in points do
+         -- convert longitude and latitude into coordinates we can reasonably use on roblox
+         local xPoint, yPoint = lib.Project(point[2], point[1])
+
+         -- plot each "point" onto the map. This is optional, but helps to visualize. I'm keeping it here for debugging purposes
         local part = Instance.new("Part", location)
-        part.Name = "point" .. point
+        part.Name = "point" .. i
         part.Position = Vector3.new(xPoint, 0.1, yPoint)
         part.Size = Vector3.new(1, 1, 1)
 
-        vertices[point] = part.CFrame.Position
+        vertices[i] = Vector3.new(xPoint, 0.1, yPoint)
         -- add each point into a table. We need this for triangulation
     end
 
-    if feature.properties.building then -- handle buildings seperately because they have many different properties and features than other polygons
+    --[[if feature.properties.building then -- handle buildings seperately because they have many different properties and features than other polygons
         -- TODO:
         return
     else
-        triangulate.Perform(vertices, true)
-    end
+        triangulation.Perform(vertices, true)
+    end]]
 end
 
 --[[

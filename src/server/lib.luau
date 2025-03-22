@@ -14,6 +14,7 @@ lib = {
     FIRST_POINT = nil, -- The first point of the first feature. Assigned in loader. This will be spawned at, well, the origin. Other features will load around this (i.e. this is the center point)]]
 }
 
+
 --[[
     Project latitude and longitude to Cartesian coordinates. Formula used was obtained from @S1xty's GeoJSON Loader plugin. TODO: figure out the origin of this formula or make something actual unique (this should hopefully maybe preferably be temporary)
 ]]
@@ -132,79 +133,5 @@ end
 function lib.MakeBaseplates()
 
 end
-
--- no longer needed, keeping in case i need them again
---[[
-
-    -- Gets the distance between two spherical coordinates using the Haversine formula
-    function lib.GetLatLongDistance(lat1, long1, lat2, long2)
-        local distanceLat = math.rad(lat2 - lat1)
-        local distanceLong = math.rad(long2 - long1)
-
-        -- thank you to https://www.movable-type.co.uk/scripts/latlong.html
-        local a = math.sin(distanceLat/2) * math.sin(distanceLat/2) + math.cos(lat1) * math.cos(lat2) * math.sin(distanceLong/2) * math.sin(distanceLong/2) -- where `a` is the square of half the chord
-        local c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a)) -- angular distance
-
-        local distance = lib.R * c
-        return distance
-    end
-
-
-    -- Gets the bounding box of all features in a GeoJSON. This is slow as it has to check through every point in every feature and should only be used during initialization.
-
-    function lib:GetBBox(geoJSON)
-    print("Getting Boundary Box. This may take a moment...")
-    local bounds = { -- we cant compare to nil, so this needs to be assigned. We can't assign them to zero because that would mean negative values wouldn't work properly. As such, we compare them to the origin
-        xMin = lib.FIRST_POINT[1],
-        xMax = lib.FIRST_POINT[1],
-        yMin = lib.FIRST_POINT[2],
-        yMax = lib.FIRST_POINT[2]
-    }
-
-    local coords, latitude, longitude
-
-    for i, _ in geoJSON do
-        coords = geoJSON[i].geometry.coordinates
-        print("Checking coordinates for feature " .. i)
-
-        if geoJSON[i].geometry.type == "Point" then
-            longitude = coords[1]
-            latitude = coords[2]
-            bounds.xMin = if bounds.xMin < longitude then longitude else bounds.xMin
-            bounds.xMax = if bounds.xMax > longitude then longitude else bounds.xMax
-            bounds.yMin = if bounds.yMin < latitude then latitude else bounds.yMin
-            bounds.yMax = if bounds.yMax > latitude then latitude else bounds.yMax
-        else
-            for v, j in coords[1] do
-                if geoJSON[i].geometry.type == "MultiPolygon" then -- just like elsewhere, we need to handle MultiPolygons differently because they're special little boys (i hate this code)
-                    local polygons = coords[v]
-                    for k, _ in polygons do
-                        longitude = polygons[k][1]
-                        latitude = polygons[k][2]
-                        bounds.xMin = if bounds.xMin < longitude then longitude else bounds.xMin
-                        bounds.xMax = if bounds.xMax > longitude then longitude else bounds.xMax
-                        bounds.yMin = if bounds.yMin < latitude then latitude else bounds.yMin
-                        bounds.yMax = if bounds.yMax > latitude then latitude else bounds.yMax
-                    end
-                else
-                    longitude = coords[j][1]
-                    latitude = coords[j][2]
-                    bounds.xMin = if bounds.xMin < longitude then longitude else bounds.xMin
-                    bounds.xMax = if bounds.xMax > longitude then longitude else bounds.xMax
-                    bounds.yMin = if bounds.yMin < latitude then latitude else bounds.yMin
-                    bounds.yMax = if bounds.yMax > latitude then latitude else bounds.yMax
-                end
-            end
-        end
-    end
-
-    self.BOUND_BOX = {
-        xMin = bounds.xMin,
-        xMax = bounds.xMax,
-        yMin = bounds.yMin,
-        yMax = bounds.yMax,
-    }
-    end
-]]
 
 return lib

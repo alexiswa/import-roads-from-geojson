@@ -47,22 +47,23 @@ function loader.main()
                 ways.Main(feature, i)
             end)
             if err then
-                error(`Error loading feature {i}, skipping. \n\t\t\t\t Error: {err}`) -- setting this to error while im making it
+                warn(`Error loading feature {i}, skipping. \n\t\t\t\t Error: {err}`) -- setting this to error while im making it
             end
         elseif feature.geometry.type == "Polygon" then
             local succ, err = pcall(function()
                 polygons.Main(feature, i)
             end)
             if err then
-                error(`Error loading feature {i}, skipping. \n\t\t\t\t Error: {err}`) -- setting this to error while im making it
+                warn(`Error loading feature {i}, skipping. \n\t\t\t\t Error: {err}`) -- setting this to error while im making it
             end
         elseif feature.geometry.type == "MultiPolygon" then
-            
+            -- TODO
         else
             warn(`Feature {i} has unknown geomtry type {feature.geometry.type}, skipping`)
         end
-        --task.wait() -- this might actually slow things down. Without it, however, studio might freeze. If you're willing to risk studio briefly freezing for a quicker load time, comment this out.
     end
+
+    print("Done!")
 end
 
 return loader
