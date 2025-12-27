@@ -30,7 +30,7 @@ end
 --[[
     Distribute a selection of nodes between two points
 ]]
- function lib.Distribute(partsToDistribute : table, anchorOne, anchorTwo)
+ function lib.Distribute(partsToDistribute : {}, anchorOne, anchorTwo)
     --[[
         DISCLAIMER: I TAKE NO CREDIT FOR THE CREATION OF THIS PARTICULAR FUNCTION
         This function is a derivative of the free and open-source plugin found here:
