@@ -90,9 +90,9 @@ function GetFeatureType(feature: Feature): (string, string)
 end
 
 -- divide the distance between two points in half, for long ways
-function DivideMidpoints(p1, p2, width, height): {Vector3}
+function DivideMidpoints(p1: Vector3, p2: Vector3): {Vector3}
     local midpoint = (p1 + p2) / 2
-	
+	 
     local newMidpoints: {Vector3} = {midpoint}
 
     -- recursively divide them again if its still too long
