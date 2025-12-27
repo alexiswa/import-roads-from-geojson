@@ -18,6 +18,9 @@ type Feature = {
 }
 type GeoJsonInfo = {Feature}
 
+---- CONSTANTS ----
+local STUD_CONVERT = 25 / 7 -- studs to meters
+
 ---- MAIN ----
 
 -- initialize plugin toolbar things
@@ -108,6 +111,26 @@ function main()
         end
 
         brickProperties = featureType.BrickProperties
+
+        local points = feature.geometry.coordinates
+
+        local location = Instance.new(folder)
+        location.Parent = folder
+        location.Name = "Feature" .. i
+
+        local width = 
+            if feature.properties.width then feature.properties.width * STUD_CONVERT
+            elseif feature.properties.lanes then featureType.defaultWidth/2 * feature.properties.lanes
+            elseif featureType.defaultWidth then featureType.defaultWidth
+            else 5
+
+        local height =
+            if feature.properties.layer then feature.properties.layer * 10 * STUD_CONVERT
+            elseif feature.properties.bridge then 10 * STUD_CONVERT
+            elseif feature.properties.tunnel then -10 * STUD_CONVERT
+            else 0
+
+        
     end
 end
 
