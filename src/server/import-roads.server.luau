@@ -89,6 +89,30 @@ function GetFeatureType(feature: Feature): (string, string)
     return key, value
 end
 
+function connectPoints(point: number, pointVectors: {Vector3}, width: number)
+
+    local p1 = pointVectors[point - 1]
+    local p2 = pointVectors[point]
+
+    local magnitude = (p1 - p2).magnitude
+    local midpoint = (p1 + p2)/2
+
+    -- if the magnitude is greater than 2048, it needs to be split into several smaller parts, which is much more complicated
+    while magnitude >= 2048 do
+        local temppoint = midpoint
+
+
+    end
+
+    -- make a part between the two points
+    local link: Part = Instance.new("Part")
+    link.CFrame = CFrame.new(p1, p2) -- pos, lookat
+    link.Name = "link " .. point - 1
+    link.Size = Vector3.new(width, 1, magnitude)
+    link.Position = midpoint
+end
+
+
 function main()
     local GeoJsonInfo: GeoJsonInfo = LoadJsonFile()
 
@@ -147,23 +171,7 @@ function main()
 
             -- plot each point
             if point >= 2 then
-                local p1 = pointsAsVectors[point - 1]
-                local p2 = pointsAsVectors[point]
-
-                local magnitude = (p1 - p2).magnitude
-                local midpoint = (p1 + p2)/2
-
-                -- if the magnitude is greater than 2048, it needs to be split into several smaller parts, which is much more complicated
-                while magnitude >= 2048 do
-                    
-                end
-
-                -- make a part between the two points
-                local link = Instance.new("Part")
-                link.CFrame = CFrame.new(p1, p2) -- pos, lookat
-                link.Name = "link " .. point - 1
-                link.Size = Vector3.new(width, 1, magnitude)
-                link.Position = midpoint
+                
             end
         end
 
