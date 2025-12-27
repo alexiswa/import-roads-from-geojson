@@ -44,14 +44,6 @@ function GetFirstPoint(features: GeoJsonInfo)
                         else {coords[1][1][1][1], coords[1][1][1][2]}
 end
 
-function CheckFeatureType(feature: Feature, i: number)
-    if feature.geometry.type == "LineString" then
-        return true
-    else
-        return false
-    end
-end
-
 function GetPrimaryFeatureTag(feature: Feature): (string, string)
     
     local key: string, value: string = nil, nil
