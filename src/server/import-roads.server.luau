@@ -114,10 +114,8 @@ function connectPoints(point: number, pointVectors: {Vector3}, width: number)
     local midpoint = (p1 + p2)/2
 
     -- if the magnitude is greater than 2048, it needs to be split into several smaller parts, which is much more complicated
-    while magnitude >= 2048 do
-        local temppoint = midpoint
-
-
+    if magnitude >= 2048 then
+        DivideMidpoints(p1, p2)
     end
 
     -- make a part between the two points
