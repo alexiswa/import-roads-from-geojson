@@ -18,7 +18,7 @@ local lib = require(plugin.lib)
 loader = {}
 
 function loader.main()
-    local file = StudioService:PromptImportFile({"geojson", "json"})
+    local file = StudioService:PromptImportFileAsync({"geojson", "json"})
     local data = file:GetBinaryContents()
     local Features = HttpService:JSONDecode(data).features
     local folder = Instance.new("Folder", Workspace)
