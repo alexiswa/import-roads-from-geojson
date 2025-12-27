@@ -48,6 +48,37 @@ function CheckFeatureType(feature: Feature, i: number)
         return false
     end
 end
+
+function GetPrimaryFeatureTag(feature: Feature): (string, string)
+    
+    local key: string, value: string = nil, nil
+
+    -- Determine the main feature type, or 'key'
+    for _, featureType in FeatureTypes do
+        if feature.properties[featureType.name] then
+            key = featureType.name
+        end
+    end
+
+    -- if no key has been found, then it is not implemented
+    if key == nil then
+        return "other", "other"
+    end
+
+    -- determine the secondary feature type, or 'value'
+    for _, subtype in FeatureTypes[key] do
+        if feature.properties[key] == subtype.name then
+            value = subtype.name
+        end
+    end
+
+    if value == nil then
+        value = "other"
+    end
+
+    return key, value
+end
+
 function main()
     local GeoJsonInfo: GeoJsonInfo = LoadJsonFile()
 
@@ -66,6 +97,17 @@ function main()
             print(`Feature {i} is not a way, skipping`)
             continue
         end
+
+        local key, value = GetPrimaryFeatureTag(feature)
+
+        local featureType = FeatureTypes[key][value]
+
+        -- skip the feature if it is defined to not render or the main value is not defined
+        if featureType.norender or key == "other" then
+            continue
+        end
+
+        brickProperties = featureType.BrickProperties
     end
 end
 
