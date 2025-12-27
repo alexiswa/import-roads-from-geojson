@@ -89,6 +89,22 @@ function GetFeatureType(feature: Feature): (string, string)
     return key, value
 end
 
+function DivideMidpoints(p1, p2)
+    local midpoint = (p1 + p2) / 2
+	
+	local p = Instance.new("Part")
+	p.Position = midpoint
+	p.Parent = workspace
+
+    if (midpoint - p1).magnitude >= 2048 then
+        DivideMidpoints(midpoint, p1)
+    end
+
+    if (midpoint - p2).magnitude >= 2048 then
+        DivideMidpoints(midpoint, p2)
+    end
+end
+
 function connectPoints(point: number, pointVectors: {Vector3}, width: number)
 
     local p1 = pointVectors[point - 1]
