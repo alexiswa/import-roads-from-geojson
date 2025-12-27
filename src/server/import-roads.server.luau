@@ -154,6 +154,7 @@ function ConnectPoints(point: number, pointVectors: {Vector3}, width: number, pa
         return
     end
 
+    MakeLink(p1, p2, width, parent)
 end
 
 
