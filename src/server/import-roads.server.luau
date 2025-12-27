@@ -1,4 +1,3 @@
---!strict
 ---- SERVICES ----
 local StudioService = game:GetService("StudioService")
 local HttpService = game:GetService("HttpService")
