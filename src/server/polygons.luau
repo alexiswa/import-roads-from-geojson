@@ -1,6 +1,5 @@
 local lib = require(script.Parent.lib)
 local material = Enum.Material
-local triangulation = require(script.Parent.triangulation)
 --[[
     Checks to see if feature properties match any described in the `polygons` dictionary.
     Will probably break if it has two "high level" tags (such as building AND landuse),
