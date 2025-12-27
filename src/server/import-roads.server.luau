@@ -109,7 +109,17 @@ function DivideMidpoints(p1: Vector3, p2: Vector3): {Vector3}
     return newMidpoints
 end
 
-function ConnectPoints(point: number, pointVectors: {Vector3}, width: number)
+function MakeLink(p1, p2, width: number, parent)
+    -- make a part between the two points
+    local link: Part = Instance.new("Part")
+    link.CFrame = CFrame.new(p1, p2) -- pos, lookat
+    link.Name = "link"
+    link.Size = Vector3.new(width, 1, (p1 - p2).Magnitude) -- distance
+    link.Position = (p1 + p2)/2 -- midpoint
+    link.Parent = parent
+end
+
+function ConnectPoints(point: number, pointVectors: {Vector3}, width: number, parent)
 
     local p1 = pointVectors[point - 1]
     local p2 = pointVectors[point]
@@ -120,39 +130,28 @@ function ConnectPoints(point: number, pointVectors: {Vector3}, width: number)
     -- if the magnitude is greater than 2048, it needs to be split into several smaller parts due to the roblox part size limit
     if magnitude >= 2048 then
         local newPoints = DivideMidpoints(p1, p2)
+        table.insert(newPoints, #newPoints/2, midpoint)
+
+        print(#newPoints)
+
+        if #newPoints == 1 then
+            MakeLink(p1, newPoints[1], width, parent)
+            MakeLink(newPoints[1], p2, width, parent)
+            return
+        end
 
         for i, point in newPoints do
             if i == 1 then
-                -- make a part between the two points
-                local link: Part = Instance.new("Part")
-                link.CFrame = CFrame.new(p1, newPoints[i+1]) -- pos, lookat
-                link.Name = "midlink " .. i - 1
-                ink.Size = Vector3.new(width, 1, magnitude)
-                link.Position = point
+                MakeLink(p1, point, width, parent)
             elseif i == #newPoints then
-                -- make a part between the two points
-                local link: Part = Instance.new("Part")
-                link.CFrame = CFrame.new(newPoints[i-1], p2) -- pos, lookat
-                link.Name = "midlink " .. i - 1
-                link.Size = Vector3.new(width, 1, magnitude)
-                link.Position = point
+                MakeLink(point, p2, width, parent)
             else
-                -- make a part between the two points
-                local link: Part = Instance.new("Part")
-                link.CFrame = CFrame.new(newPoints[i-1], newPoints[i+1]) -- pos, lookat
-                link.Name = "midlink " .. i - 1
-                link.Size = Vector3.new(width, 1, magnitude)
-                link.Position = point
+                MakeLink(newPoints[i-1], newPoints[i+1], width, parent)
             end
         end
+        return
     end
 
-    -- make a part between the two points
-    local link: Part = Instance.new("Part")
-    link.CFrame = CFrame.new(p1, p2) -- pos, lookat
-    link.Name = "link " .. point - 1
-    link.Size = Vector3.new(width, 1, magnitude)
-    link.Position = midpoint
 end
 
 
