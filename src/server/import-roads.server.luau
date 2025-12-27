@@ -43,7 +43,18 @@ end
 function main()
     local GeoJsonInfo: GeoJsonInfo = LoadJsonFile()
 
+    local folder = Instance.new("Folder")
+    folder.Name = "Features"
+    folder.Parent = workspace
 
+    local FIRST_POINT = GetFirstPoint(GeoJsonInfo)
+
+    -- the core loop, which iterates through each feature
+    for i, feature in GeoJsonInfo do
+        print(`Loading feature {i}`)
+
+        end
+    end
 end
 
 
