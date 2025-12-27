@@ -32,14 +32,11 @@
     
     attribution:
             dytme's plugin for distributing points, https://github.com/dytme/Distribute-Parts/tree/main
-            Chaotic Cody's https://github.com/Chaotic-Cody/polyhedron/tree/master, specifically src/ReplicatedStorage/TriangleModule.lua, which I use for filling polygons
             S1xty for creating the plugin that inspired this, and the formula used to project longitude and latitude onto roblox coordinates which I got from his plugin.
 
         models:
             https://sketchfab.com/3d-models/low-poly-shrub-013144890fc24115937487781e8d3953 by @art_is_Scaryy
             https://create.roblox.com/store/asset/10707210767/Low-Poly-Tree?viewFromStudio=true&keyword=low%20poly%20tree&searchId=4f2e8ace-180b-464c-931c-25c56d42ba5d by @z4cked on Roblox
-
-    made and formatted with rojo in mind, shouldnt be too different for studio users though.
 
     TODO:
         actually render stuff lol

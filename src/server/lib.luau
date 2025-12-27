@@ -92,6 +92,7 @@ function lib:GetFirstPoint(features)
                         else {coords[1][1][1][1], coords[1][1][1][2]}
 end
 
+--- https://github.com/EgoMoose/Articles/blob/master/3d%20triangles/3D%20triangles.md
 function lib.draw3dTriangle(a, b, c, parent)
 
 	local ab, ac, bc = b - a, c - a, c - b

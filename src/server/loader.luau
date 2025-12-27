@@ -17,12 +17,6 @@ local lib = require(plugin.lib)
 
 loader = {}
 
---[[
-This function is the only thing actually being called. Most of what it does is logic, it detects what type
-of geometry a feature has and loads the relevant function to render it. LineStrings are handled in the
-`ways` script, polygons are handled in the `areas` script, and multi-polygons are handled in the
-`relations` script
-]]
 function loader.main()
     local file = StudioService:PromptImportFile({"geojson", "json"})
     local data = file:GetBinaryContents()

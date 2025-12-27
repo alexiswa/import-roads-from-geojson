@@ -1,4 +1,3 @@
-local HttpService = game:GetService("HttpService")
 --[[
     This file is part of GeoJSON Loader 2.0.
 
@@ -10,7 +9,39 @@ local HttpService = game:GetService("HttpService")
 
 local lib = require(script.Parent.lib)
 local studConvert = lib.STUD_CONVERT
+local HttpService = game:GetService("HttpService")
 
+--[[
+    Checks to see if feature properties match any described in the `ways` table.
+    Will probably break if it has two "high level" tags (such as railway AND highway),
+    so dont do that.
+]]
+local function matchProperties(feature)
+    local properties = feature.properties
+    local key, value
+
+    -- i am not yanderedev :sob:
+    if properties.highway then
+        key = "highway"
+    elseif properties.railway then
+        key = "railway"
+    elseif properties.waterway then
+        key = "waterway"
+    elseif properties.barrier then
+        key = "barrier"
+    else
+        key = "other"
+    end
+
+    if ways[key] == nil then -- you cant check ways[key][feature.properties[key]] if ways[key] is null, so if ways[key] is null, assign value as "other"
+        value = "other"
+    elseif ways[key][feature.properties[key]] then
+        value = feature.properties[key]
+    else
+        value = "other"
+    end
+    return key, value
+end
 --[[
 A table of all ways that are compatable with the plugin. If you want to add your own, you should be able to relatively easily.
 Currently supports most highway features, some waterway features, and has generic attributes for rail and barrier features.
@@ -217,7 +248,7 @@ ways = {
 Main function for processing ways
 ]]
 function ways.Main(feature, i)
-    local key, value = ways.matchProperties(feature)
+    local key, value = matchProperties(feature)
     local brickProperties
     
     if key == "other" or ways[key][value] == nil then return end -- dont continue if a feature isnt defined
@@ -272,31 +303,26 @@ function ways.Main(feature, i)
     end
 end
 
-
 --[[
-    Draw a line between two points.
+    Used to draw ways which would have a length > 2048 studs
 ]]
-function ways.Draw(pointOne, pointTwo, location, i)
-    local magnitude = (pointOne.Position - pointTwo.Position).Magnitude
-    local midPoint = (pointOne.Position + pointTwo.Position)/2
-
-    if magnitude >= 2048 then -- max part length of 2048, if its over this length we need to split it into smaller parts and handle it seperately
-        warn(`Warning! Feature {i} has a segment longer than 2048 studs! Maximum length: 2048, segment length: {magnitude}`)
+local function drawLong(i, magnitude, location, midPoint, pointOne, pointTwo)
+    warn(`Warning! Feature {i} has a segment longer than 2048 studs! Maximum length: 2048, segment length: {magnitude}`)
 
         local magnitudeCheck = magnitude
-        local i = 0
+        local p = 0
         local partsToCheck = {}
         local links = {}
         local extraNodes = Instance.new("Folder", location)
         extraNodes.Name = "extraNodes" .. HttpService:GenerateGUID(false)
-    
+
         while magnitudeCheck >= 2048 do -- determine how many parts we need
             magnitudeCheck /= 2
-            i += 10
+            p += 10
             task.wait()
         end
 
-        for j = 1, i do -- make `i` points
+        for j = 1, p do -- make `p` points
             local newNode = Instance.new("Part", extraNodes)
             newNode.Name = "IntermediateNode" .. j
             newNode.Position = midPoint
@@ -316,10 +342,6 @@ function ways.Draw(pointOne, pointTwo, location, i)
             local magnitude = (newPointOne.Position - newPointTwo.Position).Magnitude
             local midPoint = (newPointOne.Position + newPointTwo.Position)/2
 
-            if magnitude > 2048 then -- if something has been divided into this many segments and it still has gaps, frankly its not my problem anymore.
-                warn(`Feature has a VERY long segment! Gaps are likely to occur. Attempting to render.. `)
-            end
-
             local link = Instance.new("Part", location)
             link.CFrame = CFrame.new(newPointOne.Position, newPointTwo.Position) -- CFrame.new(pos, lookAt). This means that the position will be at point one, and it will be rotated to point towards point two
             link.Name = "Link".. l - 1
@@ -327,9 +349,19 @@ function ways.Draw(pointOne, pointTwo, location, i)
             link.Position = midPoint
 
             table.insert(links, link)
+            return links
         end
+end
 
-        return links
+--[[
+    Draw a line between two points.
+]]
+function ways.Draw(pointOne, pointTwo, location, i)
+    local magnitude = (pointOne.Position - pointTwo.Position).Magnitude
+    local midPoint = (pointOne.Position + pointTwo.Position)/2
+
+    if magnitude >= 2048 then -- max part length of 2048, if its over this length we need to split it into smaller parts and handle it seperately
+        return drawLong(i, magnitude, location, midPoint, pointOne, pointTwo)
     else
         local link = Instance.new("Part", location)
         link.CFrame = CFrame.new(pointOne.Position, pointTwo.Position) -- CFrame.new(pos, lookAt). This means that the position will be at point one, and it will be rotated to point towards point two
@@ -339,38 +371,6 @@ function ways.Draw(pointOne, pointTwo, location, i)
 
         return link
     end
-end
-
---[[
-    Checks to see if feature properties match any described in the `ways` table.
-    Will probably break if it has two "high level" tags (such as railway AND highway),
-    so dont do that.
-]]
-function ways.matchProperties(feature)
-    local properties = feature.properties
-    local key, value
-
-    -- i am not yanderedev :sob:
-    if properties.highway then
-        key = "highway"
-    elseif properties.railway then
-        key = "railway"
-    elseif properties.waterway then
-        key = "waterway"
-    elseif properties.barrier then
-        key = "barrier"
-    else
-        key = "other"
-    end
-
-    if ways[key] == nil then -- you cant check ways[key][feature.properties[key]] if ways[key] is null, so if ways[key] is null, assign value as "other"
-        value = "other"
-    elseif ways[key][feature.properties[key]] then
-        value = feature.properties[key]
-    else
-        value = "other"
-    end
-    return key, value
 end
 
 return ways

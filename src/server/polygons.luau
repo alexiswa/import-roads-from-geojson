@@ -1,6 +1,38 @@
 local lib = require(script.Parent.lib)
 local material = Enum.Material
 local triangulation = require(script.Parent.triangulation)
+--[[
+    Checks to see if feature properties match any described in the `polygons` dictionary.
+    Will probably break if it has two "high level" tags (such as building AND landuse),
+    so dont do that.
+]]
+local function matchProperties(feature)
+    local properties = feature.properties
+    local key, value
+
+    -- i am not yanderedev :sob:
+    if properties.natural then
+        key = "natural"
+    elseif properties.landuse then
+        key = "landuse"
+    elseif properties.amenity then
+        key = "amenity"
+    elseif properties.leisure then
+        key = "leisure"
+    elseif properties.railway then
+        key = "railway"
+    else key = "other" end
+
+
+    if polygons[key] == nil then
+        value = "other"
+    elseif polygons[key][feature.properties[key]] then
+        value = feature.properties[key]
+    else
+        value = "other"
+    end
+    return key, value
+end
 
 polygons = {
     natural = {
@@ -361,7 +393,7 @@ polygons = {
 }
 
 function polygons.Main(feature, n)
-    local key, value = polygons.matchProperties(feature)
+    local key, value = matchProperties(feature)
 
     if key == "other" or polygons[key][value] == nil then return end -- dont continue if a feature isnt defined
 
@@ -389,45 +421,14 @@ function polygons.Main(feature, n)
         -- add each point into a table. We need this for triangulation
     end
 
+    lib.draw3dTriangle()
+
     --[[if feature.properties.building then -- handle buildings seperately because they have many different properties and features than other polygons
         -- TODO:
         return
     else
         triangulation.Perform(vertices, true)
     end]]
-end
-
---[[
-    Checks to see if feature properties match any described in the `polygons` dictionary.
-    Will probably break if it has two "high level" tags (such as building AND landuse),
-    so dont do that.
-]]
-function polygons.matchProperties(feature)
-    local properties = feature.properties
-    local key, value
-
-    -- i am not yanderedev :sob:
-    if properties.natural then
-        key = "natural"
-    elseif properties.landuse then
-        key = "landuse"
-    elseif properties.amenity then
-        key = "amenity"
-    elseif properties.leisure then
-        key = "leisure"
-    elseif properties.railway then
-        key = "railway"
-    else key = "other" end
-
-
-    if polygons[key] == nil then
-        value = "other"
-    elseif polygons[key][feature.properties[key]] then
-        value = feature.properties[key]
-    else
-        value = "other"
-    end
-    return key, value
 end
 
 return polygons
