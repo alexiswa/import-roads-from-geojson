@@ -117,7 +117,7 @@ function main()
             continue
         end
 
-        brickProperties = featureType.BrickProperties
+        local brickProperties = featureType.BrickProperties
 
         local points = feature.geometry.coordinates
 
@@ -137,7 +137,7 @@ function main()
             elseif feature.properties.tunnel then -10 * STUD_CONVERT
             else 0
 
-        local pointsAsVectors: Vector3 = {}
+        local pointsAsVectors: {Vector3} = {}
         
         for point, _ in points do
             -- convert longitude and latitude into x and z
