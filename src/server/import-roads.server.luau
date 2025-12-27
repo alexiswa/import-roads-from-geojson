@@ -221,13 +221,13 @@ function main()
 
             -- connect each point
             if point >= 2 then
-                ConnectPoints(point, pointsAsVectors, width)
+                ConnectPoints(point, pointsAsVectors, width, location)
             end
         end
 
-        for _, i in location do
+        for _, i in location:GetChildren() do
             -- check if theres any properties to be assigned
-            if not string.match(i.name, "link") and brickProperties == nil then
+            if not string.match(i.Name, "link") and brickProperties == nil then
                 continue
             end
 
