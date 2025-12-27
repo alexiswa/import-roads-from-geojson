@@ -3,7 +3,7 @@ local StudioService = game:GetService("StudioService")
 local HttpService = game:GetService("HttpService")
 
 ---- MODULES ----
-local FeatureTypes = require("FeatureTypes.luau")
+local FeatureTypes = require(script.ModuleScript)
 
 ---- TYPES ----
 type Feature = {
