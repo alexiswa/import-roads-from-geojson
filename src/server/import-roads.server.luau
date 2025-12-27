@@ -175,6 +175,11 @@ function main()
         end
 
         local key, value = GetFeatureType(feature)
+        
+        if key == "other" then
+            print(`Feature {i} is not supported, skipping`)
+            continue
+        end
 
         local featureType = FeatureTypes[key][value]
 
