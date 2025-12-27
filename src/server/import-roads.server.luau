@@ -97,19 +97,21 @@ function DivideMidpoints(p1: Vector3, p2: Vector3): {Vector3}
 
     -- recursively divide them again if its still too long
     if (midpoint - p1).magnitude >= 2048 then
+        local tmp = DivideMidpoints(p1, midpoint)
         -- add the new point to the start of the table
-        table.insert(newMidpoints, 1, DivideMidpoints(midpoint, p1))
+        table.move(tmp, 1, #tmp, 1, newMidpoints)
     end
 
     if (midpoint - p2).magnitude >= 2048 then
+        local tmp = DivideMidpoints(midpoint, p2)
         -- add the new point to the end of the table
-        table.insert(newMidpoints, DivideMidpoints(midpoint, p2))
+        table.move(tmp, 1, #tmp, #newMidpoints, newMidpoints)
     end
 
     return newMidpoints
 end
 
-function MakeLink(p1, p2, width: number, parent)
+function MakeLink(p1: Vector3, p2: Vector3, width: number, parent)
     -- make a part between the two points
     local link: Part = Instance.new("Part")
     link.CFrame = CFrame.new(p1, p2) -- pos, lookat
