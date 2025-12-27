@@ -13,7 +13,7 @@ type Feature = {
         ["type"]: string
    },
    ["properties"]: {
-        {key: string}
+        {any}
    }
 }
 type GeoJsonInfo = {Feature}
@@ -40,6 +40,7 @@ function GetFirstPoint(features: GeoJsonInfo)
                         elseif features[1].geometry.type == "Polygon" then {coords[1][1][1], coords[1][1][2]}
                         else {coords[1][1][1][1], coords[1][1][1][2]}
 end
+
 function CheckFeatureType(feature: Feature, i: number)
     if feature.geometry.type == "LineString" then
         return true
