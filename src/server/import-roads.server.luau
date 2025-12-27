@@ -40,6 +40,13 @@ function GetFirstPoint(features: GeoJsonInfo)
                         elseif features[1].geometry.type == "Polygon" then {coords[1][1][1], coords[1][1][2]}
                         else {coords[1][1][1][1], coords[1][1][1][2]}
 end
+function CheckFeatureType(feature: Feature, i: number)
+    if feature.geometry.type == "LineString" then
+        return true
+    else
+        return false
+    end
+end
 function main()
     local GeoJsonInfo: GeoJsonInfo = LoadJsonFile()
 
@@ -53,6 +60,10 @@ function main()
     for i, feature in GeoJsonInfo do
         print(`Loading feature {i}`)
 
+        -- skip features that arent a way
+        if feature.geometry.type ~= "LineString" then
+            print(`Feature {i} is not a way, skipping`)
+            continue
         end
     end
 end
