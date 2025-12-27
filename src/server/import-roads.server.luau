@@ -26,7 +26,7 @@ local SCALE_FACTOR = 637813 -- adjust this as needed, arbitrary coefficient for 
 
 -- initialize plugin toolbar things
 local Toolbar = plugin:CreateToolbar("GeoJSON Importer Early Access")
-local Button = Toolbar:CreateButton("Click to select a file", "Import GeoJSON", "rbxassetid://12993969414") -- TODO: make a proper icon
+local Button = Toolbar:CreateButton("abcdefg", "abcdefg", "rbxassetid://12993969414") -- TODO: make a proper icon
 
 -- Prompt the user to load a GeoJSON formatted file and return the features as a table
 function LoadJsonFile(): GeoJsonInfo
@@ -90,25 +90,36 @@ function GetFeatureType(feature: Feature): (string, string)
 end
 
 -- divide the distance between two points in half, for long ways
-function DivideMidpoints(p1: Vector3, p2: Vector3): {Vector3}
-    local midpoint = (p1 + p2) / 2
-	 
-    local newMidpoints: {Vector3} = {midpoint}
+-- TODO: FIX GAPS
+function DivideMidpoints(p1: Vector3, p2: Vector3): Vector3 | {Vector3}
+	local midpoint = (p1 + p2) / 2
+	
+	local extraMidpoints: {Vector3} = {midpoint}
+	
+	-- recursively divide them again if its still too long
+	if (midpoint - p1).magnitude >= 2048 then
+        local tmp: Vector3 | {Vector3} = DivideMidpoints(p1, midpoint)
+		if typeof(tmp) == "Vector3" then
+            table.insert(extraMidpoints, 1, tmp)
+        else
+            table.move(tmp, 1, #tmp, 1, extraMidpoints)
+        end
+	end
 
-    -- recursively divide them again if its still too long
-    if (midpoint - p1).magnitude >= 2048 then
-        local tmp = DivideMidpoints(p1, midpoint)
-        -- add the new point to the start of the table
-        table.move(tmp, 1, #tmp, 1, newMidpoints)
-    end
-
-    if (midpoint - p2).magnitude >= 2048 then
-        local tmp = DivideMidpoints(midpoint, p2)
-        -- add the new point to the end of the table
-        table.move(tmp, 1, #tmp, #newMidpoints, newMidpoints)
-    end
-
-    return newMidpoints
+	if (midpoint - p2).magnitude >= 2048 then
+        local tmp: Vector3 | {Vector3} = DivideMidpoints(midpoint, p2)
+        if typeof(tmp) == "Vector3" then
+            table.insert(extraMidpoints, tmp)
+        else
+            table.move(tmp, 1, #tmp, #extraMidpoints+1, extraMidpoints)
+        end
+	end
+	
+	if #extraMidpoints == 1 then
+		return midpoint
+	else
+        return extraMidpoints
+	end
 end
 
 function MakeLink(p1: Vector3, p2: Vector3, width: number, parent)
@@ -121,7 +132,7 @@ function MakeLink(p1: Vector3, p2: Vector3, width: number, parent)
     link.Parent = parent
 end
 
-function ConnectPoints(point: number, pointVectors: {Vector3}, width: number, parent)
+function ConnectPoints(point: number, pointVectors: {Vector3}, width: number, parent, i)
 
     local p1 = pointVectors[point - 1]
     local p2 = pointVectors[point]
@@ -134,7 +145,7 @@ function ConnectPoints(point: number, pointVectors: {Vector3}, width: number, pa
         local newPoints = DivideMidpoints(p1, p2)
         table.insert(newPoints, #newPoints/2, midpoint)
 
-        print(#newPoints)
+        print(`feature {i} has a long length`)
 
         if #newPoints == 1 then
             MakeLink(p1, newPoints[1], width, parent)
@@ -167,20 +178,22 @@ function main()
 
     local FIRST_POINT = GetFirstPoint(GeoJsonInfo)
 
+    print("Starting loading")
+
     -- the core loop, which iterates through each feature
     for i, feature in GeoJsonInfo do
-        print(`Loading feature {i}`)
+        --print(`Loading feature {i}`)
 
         -- skip features that arent a way
         if feature.geometry.type ~= "LineString" then
-            print(`Feature {i} is not a way, skipping`)
+            --print(`Feature {i} is not a way, skipping`)
             continue
         end
 
         local key, value = GetFeatureType(feature)
         
         if key == "other" then
-            print(`Feature {i} is not supported, skipping`)
+            --print(`Feature {i} is not supported, skipping`)
             continue
         end
 
@@ -224,7 +237,7 @@ function main()
 
             -- connect each point
             if point >= 2 then
-                ConnectPoints(point, pointsAsVectors, width, location)
+                ConnectPoints(point, pointsAsVectors, width, location, i)
             end
         end
 
