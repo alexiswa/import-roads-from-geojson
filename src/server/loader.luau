@@ -37,14 +37,14 @@ function loader.main()
             -- necessary for reasons beyond my understanding. Warn statement is not actually necessary but may as well have it i guess?
             warn(`Feature {i} is untagged, skipping..`)
         elseif feature.geometry.type == "LineString" then
-            local succ, err = pcall(function()
+            local _succ, err = pcall(function()
                 ways.Main(feature, i)
             end)
             if err then
                 warn(`Error loading feature {i}, skipping. \n\t\t\t\t Error: {err}`) -- setting this to error while im making it
             end
         elseif feature.geometry.type == "Polygon" then
-            local succ, err = pcall(function()
+            local _succ, err = pcall(function()
                 polygons.Main(feature, i)
             end)
             if err then
