@@ -187,7 +187,7 @@ function main()
 
         local points = feature.geometry.coordinates
 
-        local location = Instance.new(folder)
+        local location = Instance.new("Folder")
         location.Parent = folder
         location.Name = "Feature" .. i
 
