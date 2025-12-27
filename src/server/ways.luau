@@ -306,51 +306,51 @@ end
 --[[
     Used to draw ways which would have a length > 2048 studs
 ]]
-local function drawLong(i, magnitude, location, midPoint, pointOne, pointTwo)
+local function drawLong(i, magnitude, location, midPoint, pointOne, pointTwo): {Part}
     warn(`Warning! Feature {i} has a segment longer than 2048 studs! Maximum length: 2048, segment length: {magnitude}`)
 
-        local magnitudeCheck = magnitude
-        local p = 0
-        local partsToCheck = {}
-        local links = {}
-        local extraNodes = Instance.new("Folder", location)
-        extraNodes.Name = "extraNodes" .. HttpService:GenerateGUID(false)
+    local magnitudeCheck = magnitude
+    local p = 0
+    local partsToCheck = {}
+    local links = {}
+    local extraNodes = Instance.new("Folder", location)
+    extraNodes.Name = "extraNodes" .. HttpService:GenerateGUID(false)
 
-        while magnitudeCheck >= 2048 do -- determine how many parts we need
-            magnitudeCheck /= 2
-            p += 10
-            task.wait()
-        end
+    while magnitudeCheck >= 2048 do -- determine how many parts we need
+        magnitudeCheck /= 2
+        p += 10
+        task.wait()
+    end
 
-        for j = 1, p do -- make `p` points
-            local newNode = Instance.new("Part", extraNodes)
-            newNode.Name = "IntermediateNode" .. j
-            newNode.Position = midPoint
-            table.insert(partsToCheck, newNode)
-        end
-        lib.Distribute(partsToCheck, pointOne, pointTwo) -- distribute previously made points between the two original points
+    for j = 1, p do -- make `p` points
+        local newNode = Instance.new("Part", extraNodes)
+        newNode.Name = "IntermediateNode" .. j
+        newNode.Position = midPoint
+        table.insert(partsToCheck, newNode)
+    end
+    lib.Distribute(partsToCheck, pointOne, pointTwo) -- distribute previously made points between the two original points
 
-        for l, _ in extraNodes:GetChildren() do -- this segment does essentially the same thing as it would if the magnitude werent > 2048. It just iterates over the intermediate nodes instead of the actual nodes. This is to get around roblox's part size limit.
+    for l, _ in extraNodes:GetChildren() do -- this segment does essentially the same thing as it would if the magnitude werent > 2048. It just iterates over the intermediate nodes instead of the actual nodes. This is to get around roblox's part size limit.
+        -- if l = 0, then keep pointOne the same. otherwise, set it to the previous point.
+        local newPointOne = if l == 1 then pointOne else
+            extraNodes["IntermediateNode" .. l-1]
 
-            -- if l = 0, then keep pointOne the same. otherwise, set it to the previous point.
-            local newPointOne = if l == 1 then pointOne else
-                extraNodes["IntermediateNode" .. l-1]
+        local newPointTwo = if l >= (#extraNodes:GetChildren() - 1) then pointTwo else
+            extraNodes["IntermediateNode" .. l]
 
-            local newPointTwo = if l >= (#extraNodes:GetChildren() - 1) then pointTwo else
-                extraNodes["IntermediateNode" .. l]
+        local nMagnitude = (newPointOne.Position - newPointTwo.Position).Magnitude
+        local nMidPoint = (newPointOne.Position + newPointTwo.Position)/2
 
-            local magnitude = (newPointOne.Position - newPointTwo.Position).Magnitude
-            local midPoint = (newPointOne.Position + newPointTwo.Position)/2
+        local link = Instance.new("Part", location)
+        link.CFrame = CFrame.new(newPointOne.Position, newPointTwo.Position) -- CFrame.new(pos, lookAt). This means that the position will be at point one, and it will be rotated to point towards point two
+        link.Name = "Link".. l - 1
+        link.Size = Vector3.new(1, 1, nMagnitude)
+        link.Position = nMidPoint
 
-            local link = Instance.new("Part", location)
-            link.CFrame = CFrame.new(newPointOne.Position, newPointTwo.Position) -- CFrame.new(pos, lookAt). This means that the position will be at point one, and it will be rotated to point towards point two
-            link.Name = "Link".. l - 1
-            link.Size = Vector3.new(1, 1, magnitude)
-            link.Position = midPoint
+        table.insert(links, link)
+    end
 
-            table.insert(links, link)
-            return links
-        end
+    return links
 end
 
 --[[
