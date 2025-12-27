@@ -44,7 +44,8 @@ function GetFirstPoint(features: GeoJsonInfo)
                         else {coords[1][1][1][1], coords[1][1][1][2]}
 end
 
-function GetPrimaryFeatureTag(feature: Feature): (string, string)
+-- gets the main key and value for the feature
+function GetFeatureType(feature: Feature): (string, string)
     
     local key: string, value: string = nil, nil
 
@@ -93,7 +94,7 @@ function main()
             continue
         end
 
-        local key, value = GetPrimaryFeatureTag(feature)
+        local key, value = GetFeatureType(feature)
 
         local featureType = FeatureTypes[key][value]
 
