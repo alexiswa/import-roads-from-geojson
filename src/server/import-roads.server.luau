@@ -19,6 +19,15 @@ function LoadJsonFile<T>(): GeoJsonInfo<T>
     return HttpService:JSONDecode(data).features :: GeoJsonInfo<T>
 end
 
+function GetFirstPoint(features: GeoJsonInfo<any>)
+    print("Getting origin..")
+    local coords = features[1].geometry.coordinates
+    -- each type of geometry has a slightly different structure, we need to handle them seperately
+    return if features[1].geometry.type == "Point" then {coords[1], coords[2]}
+                        elseif features[1].geometry.type == "LineString" then {coords[1][1], coords[1][2]}
+                        elseif features[1].geometry.type == "Polygon" then {coords[1][1][1], coords[1][1][2]}
+                        else {coords[1][1][1][1], coords[1][1][1][2]}
+end
 function main()
     local GeoJsonInfo: GeoJsonInfo<any> = LoadJsonFile()
 
