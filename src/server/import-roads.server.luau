@@ -89,6 +89,7 @@ function GetFeatureType(feature: Feature): (string, string)
     return key, value
 end
 
+-- divide the distance between two points in half, for long ways
 function DivideMidpoints(p1, p2)
     local midpoint = (p1 + p2) / 2
 	
@@ -96,6 +97,7 @@ function DivideMidpoints(p1, p2)
 	p.Position = midpoint
 	p.Parent = workspace
 
+    -- recursively divide them again if its still too long
     if (midpoint - p1).magnitude >= 2048 then
         DivideMidpoints(midpoint, p1)
     end
@@ -105,7 +107,7 @@ function DivideMidpoints(p1, p2)
     end
 end
 
-function connectPoints(point: number, pointVectors: {Vector3}, width: number)
+function ConnectPoints(point: number, pointVectors: {Vector3}, width: number)
 
     local p1 = pointVectors[point - 1]
     local p2 = pointVectors[point]
@@ -113,7 +115,7 @@ function connectPoints(point: number, pointVectors: {Vector3}, width: number)
     local magnitude = (p1 - p2).magnitude
     local midpoint = (p1 + p2)/2
 
-    -- if the magnitude is greater than 2048, it needs to be split into several smaller parts, which is much more complicated
+    -- if the magnitude is greater than 2048, it needs to be split into several smaller parts due to the roblox part size limit
     if magnitude >= 2048 then
         DivideMidpoints(p1, p2)
     end
@@ -163,40 +165,44 @@ function main()
         location.Parent = folder
         location.Name = "Feature" .. i
 
+        -- set width based on lane properties and tags
         local width = 
             if feature.properties.width then feature.properties.width * STUD_CONVERT
             elseif feature.properties.lanes then featureType.defaultWidth/2 * feature.properties.lanes
             elseif featureType.defaultWidth then featureType.defaultWidth
             else 5
 
+        -- set height based on layer property and tunnel/bridge properties
         local height =
             if feature.properties.layer then feature.properties.layer * 10 * STUD_CONVERT
             elseif feature.properties.bridge then 10 * STUD_CONVERT
             elseif feature.properties.tunnel then -10 * STUD_CONVERT
             else 0
 
+
         local pointsAsVectors: {Vector3} = {}
         
         for point, _ in points do
             -- convert longitude and latitude into x and z
             local x, z = Project(points[point][2], points[point][1], FIRST_POINT)
-            
+            -- add it to the table of vector points, with the height being calculated above
             table.insert(pointsAsVectors, Vector3.new(x, height, z))
 
-            -- plot each point
+            -- connect each point
             if point >= 2 then
-                
+                ConnectPoints(point, pointsAsVectors, width)
             end
         end
 
         for _, i in location do
+            -- check if theres any properties to be assigned
+            if not string.match(i.name, "link") and brickProperties == nil then
+                continue
+            end
+
             -- assign properties
-            if string.match(i.name, "link") then
-                if brickProperties ~= nil then 
-                    for p, property in brickProperties do
-                        i[p] = property
-                    end
-                end
+            for p, property in brickProperties do
+                i[p] = property
             end
         end
     end
